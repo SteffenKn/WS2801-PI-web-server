@@ -1,0 +1,7 @@
+.github/
+dist/tests
+coverage/
+
+package-lock.json
+tsconfig.json
+tslint.json

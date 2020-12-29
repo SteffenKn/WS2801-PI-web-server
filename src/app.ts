@@ -169,6 +169,12 @@ async function run(): Promise<void> {
 
     response.status(200).send('success!');
   });
+
+  webserver.addPostRoute('/led-strip/animation/finished', async(request: express.Request, response: express.Response): Promise<void> => {
+    currentAnimationProcess.once('animation-finished', (): void => {
+      response.status(200).send('success!');
+    });
+  });
 }
 
 run();

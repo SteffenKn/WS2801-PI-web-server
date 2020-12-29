@@ -153,10 +153,18 @@ async function run(): Promise<void> {
     const brightness: number | 'auto' = ledController.getBrightness();
 
     currentAnimationProcess = fork(path.join(__dirname, 'animator.js'), [animationScript, brightness.toString()], {});
-    currentAnimationProcess.once('animation-finished', (): void => {
-      currentAnimationProcess.kill();
-      currentAnimationProcess = undefined;
-    });
+
+    // tslint:disable-next-line: typedef no-any
+    const eventCallback = (message: any): void => {
+      currentAnimationProcess.removeListener('message', eventCallback);
+
+      if (message === 'animation-finished') {
+        currentAnimationProcess.kill();
+        currentAnimationProcess = undefined;
+      }
+    };
+
+    currentAnimationProcess.on('message', eventCallback);
 
     response.status(200).send('success!');
   });
@@ -171,9 +179,16 @@ async function run(): Promise<void> {
   });
 
   webserver.addGetRoute('/led-strip/animation/finished', async(request: express.Request, response: express.Response): Promise<void> => {
-    currentAnimationProcess.once('animation-finished', (): void => {
-      response.status(200).send('success!');
-    });
+    // tslint:disable-next-line: typedef no-any
+    const eventCallback = (message: any): void => {
+      currentAnimationProcess.removeListener('message', eventCallback);
+
+      if (message === 'animation-finished') {
+        response.status(200).send('success!');
+      }
+    };
+
+    currentAnimationProcess.on('message', eventCallback);
   });
 }
 

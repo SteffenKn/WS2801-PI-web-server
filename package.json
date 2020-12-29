@@ -4,7 +4,7 @@
   "description": "A ready-to-use web server for the WS2801-Pi module.",
   "main": "dist/app.js",
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "lint": "tslint --project .",
     "start": "node dist/app.js",
     "test": ""

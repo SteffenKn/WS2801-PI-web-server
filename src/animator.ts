@@ -24,7 +24,7 @@ async function runAnimation(): Promise<void> {
     global,
     {
       ledController: ledController,
-      ledAmount: Config.amountOfLeds,
+      ledAmount: config.amountOfLeds,
       exports: exports,
       module: module,
       console: console,

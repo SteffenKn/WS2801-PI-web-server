@@ -2,11 +2,11 @@
   "name": "ws2801-pi-web-server",
   "version": "0.1.0",
   "description": "A ready-to-use web server for the WS2801-Pi module.",
-  "main": "dist/app.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist && tsc",
     "lint": "tslint --project .",
-    "start": "node dist/app.js",
+    "start": "node dist/run.js",
     "test": ""
   },
   "repository": {

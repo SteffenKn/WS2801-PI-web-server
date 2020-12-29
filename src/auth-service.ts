@@ -103,14 +103,14 @@ export class AuthService {
       const apiKey: string = request.query.apiKey as string;
 
       if (!apiKey) {
-        response.status(403).send('Please register first.');
+        response.status(401).send('Please register first.');
 
         return;
       }
 
       const user: User = this.getUserByApiKey(apiKey);
       if (!user) {
-        response.status(403).send('Please register first.');
+        response.status(401).send('Please register first.');
 
         return;
       }

@@ -136,7 +136,7 @@ async function run(): Promise<void> {
     response.status(200).json({ledStrip: renderedLedStrip});
   });
 
-  webserver.addPostRoute('/led-strip/animate', async(request: express.Request, response: express.Response): Promise<void> => {
+  webserver.addPostRoute('/led-strip/animation/start', async(request: express.Request, response: express.Response): Promise<void> => {
     const animationScript: string = request.body.animationScript;
 
     if (animationScript == undefined) {
@@ -161,7 +161,7 @@ async function run(): Promise<void> {
     response.status(200).send('success!');
   });
 
-  webserver.addDeleteRoute('/led-strip/stop-animation', async(request: express.Request, response: express.Response): Promise<void> => {
+  webserver.addDeleteRoute('/led-strip/animation/stop', async(request: express.Request, response: express.Response): Promise<void> => {
     if (currentAnimationProcess) {
       currentAnimationProcess.kill();
       currentAnimationProcess = undefined;

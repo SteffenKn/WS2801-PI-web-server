@@ -148,7 +148,12 @@ export class AuthService {
         return;
       }
 
-      await this.waitForConfirmation(name);
+      try {
+        await this.waitForConfirmation(name);
+      } catch (error) {
+        response.status(403).send(error.message);
+        return;
+      }
 
       try {
         this.registerUser(name, apiKey);
@@ -213,7 +218,16 @@ export class AuthService {
   }
 
   private async waitForConfirmation(name: string): Promise<void> {
-    return new Promise((resolve: Function): void => {
+    const confirmationForUserExists: boolean = this.resolveFunctionsForRegistrationConfirmation
+      .some((resolveFunction: ResolveFunctionForRegistrationConfirmation): boolean => {
+        return resolveFunction.name === name;
+      });
+
+    if (confirmationForUserExists) {
+      throw new Error(`The user "${name}" is already waiting for confirmation.`);
+    }
+
+    const resolvePromise: Promise<void> = new Promise((resolve: Function): void => {
       this.resolveFunctionsForRegistrationConfirmation.push({
         name: name,
         resolveFunction: resolve,
@@ -222,5 +236,7 @@ export class AuthService {
       this.logger.log(`User '${name}' would like to register.
 Click this link to confirm: http://${ip.address()}:${Config.confirmationPort}/confirm-registration?name=${name.replace(/ /g, '%20').replace(/ /g, '%C2%A0')}`);
     });
+
+    return resolvePromise;
   }
 }

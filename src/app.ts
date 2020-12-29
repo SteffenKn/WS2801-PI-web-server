@@ -78,6 +78,28 @@ async function run(): Promise<void> {
     response.status(200).json({ledStrip: ledStrip});
   });
 
+  webserver.addPostRoute('/led-strip/brightness/set', async(request: express.Request, response: express.Response): Promise<void> => {
+    const brightness: number | 'auto' = request.body.brightness;
+
+    if (brightness == undefined || (typeof brightness !== 'number' && brightness !== 'auto') || brightness < 0 || brightness > 100) {
+      response.status(400).send(`Request body must contain a 'brightness' (number between 0 and 100 or 'auto' for automatic brightness).`);
+
+      return;
+    }
+
+    await ledController.setBrightness(brightness).show();
+
+    const ledStrip: LedStrip = ledController.getLedStrip();
+
+    response.status(200).json({ledStrip: ledStrip});
+  });
+
+  webserver.addGetRoute('/led-strip/brightness', async(request: express.Request, response: express.Response): Promise<void> => {
+    const brightness: number | 'auto' = ledController.getBrightness();
+
+    response.status(200).json({brightness: brightness});
+  });
+
   webserver.addPostRoute('/led-strip/set', async(request: express.Request, response: express.Response): Promise<void> => {
     const ledStrip: LedStrip = request.body.ledStrip;
 

@@ -54,4 +54,13 @@ export class Webserver {
 
     this.server.get(route, callbackWithLogging);
   }
+  public addDeleteRoute(route: string, callback: ExpressCallback): void {
+    const callbackWithLogging: ExpressCallback = (request: express.Request, response: express.Response): void => {
+      logger.log(`Requested (delete) route '${route}' with query params '${JSON.stringify(request.query, null, 2)}'.`);
+
+      callback(request, response);
+    };
+
+    this.server.delete(route, callbackWithLogging);
+  }
 }

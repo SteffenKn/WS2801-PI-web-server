@@ -1,4 +1,6 @@
+import {ChildProcess, fork} from 'child_process';
 import express from 'express';
+import path from 'path';
 
 import Ws2801Pi, {LedColor, LedStrip} from 'ws2801-pi';
 
@@ -9,6 +11,8 @@ import {Webserver} from './webserver';
 
 const webserver: Webserver = new Webserver(Config.port);
 const authService: AuthService = new AuthService(webserver);
+
+let currentAnimationProcess: ChildProcess;
 
 const ledController: Ws2801Pi = new Ws2801Pi(Config.amountOfLeds);
 
@@ -89,6 +93,10 @@ async function run(): Promise<void> {
 
     await ledController.setBrightness(brightness).show();
 
+    if (currentAnimationProcess) {
+      currentAnimationProcess.send({brightness: brightness});
+    }
+
     const ledStrip: LedStrip = ledController.getLedStrip();
 
     response.status(200).json({ledStrip: ledStrip});
@@ -126,6 +134,40 @@ async function run(): Promise<void> {
     const renderedLedStrip: LedStrip = ledController.getLedStrip();
 
     response.status(200).json({ledStrip: renderedLedStrip});
+  });
+
+  webserver.addPostRoute('/led-strip/animate', async(request: express.Request, response: express.Response): Promise<void> => {
+    const animationScript: string = request.body.animationScript;
+
+    if (animationScript == undefined) {
+      response.status(400).send(`Request body must contain a 'animationScript'.`);
+
+      return;
+    }
+
+    if (currentAnimationProcess) {
+      currentAnimationProcess.kill();
+      currentAnimationProcess = undefined;
+    }
+
+    const brightness: number | 'auto' = ledController.getBrightness();
+
+    currentAnimationProcess = fork(path.join(__dirname, 'animator.js'), [animationScript, brightness.toString()], {});
+    currentAnimationProcess.once('animation-finished', (): void => {
+      currentAnimationProcess.kill();
+      currentAnimationProcess = undefined;
+    });
+
+    response.status(200).send('success!');
+  });
+
+  webserver.addDeleteRoute('/led-strip/stop-animation', async(request: express.Request, response: express.Response): Promise<void> => {
+    if (currentAnimationProcess) {
+      currentAnimationProcess.kill();
+      currentAnimationProcess = undefined;
+    }
+
+    response.status(200).send('success!');
   });
 }
 

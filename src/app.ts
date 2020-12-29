@@ -26,7 +26,7 @@ async function run(): Promise<void> {
   webserver.addGetRoute('/led-strip', (_: express.Request, response: express.Response): void => {
     const ledStrip: LedStrip = ledController.getLedStrip();
 
-    response.status(200).json({ledStrip});
+    response.status(200).json({ledStrip: ledStrip});
   });
 
   webserver.addPostRoute('/led-strip/fill', async(request: express.Request, response: express.Response): Promise<void> => {
@@ -42,7 +42,7 @@ async function run(): Promise<void> {
 
     const ledStrip: LedStrip = ledController.getLedStrip();
 
-    response.status(200).json({ledStrip});
+    response.status(200).json({ledStrip: ledStrip});
   });
 
   webserver.addPostRoute('/led-strip/clear', async(request: express.Request, response: express.Response): Promise<void> => {
@@ -50,7 +50,7 @@ async function run(): Promise<void> {
 
     const ledStrip: LedStrip = ledController.getLedStrip();
 
-    response.status(200).json({ledStrip});
+    response.status(200).json({ledStrip: ledStrip});
   });
 
   webserver.addPostRoute('/led-strip/led/:ledIndex/set', async(request: express.Request, response: express.Response): Promise<void> => {
@@ -75,7 +75,7 @@ async function run(): Promise<void> {
 
     const ledStrip: LedStrip = ledController.getLedStrip();
 
-    response.status(200).json({ledStrip});
+    response.status(200).json({ledStrip: ledStrip});
   });
 
   webserver.addPostRoute('/led-strip/set', async(request: express.Request, response: express.Response): Promise<void> => {
@@ -103,7 +103,7 @@ async function run(): Promise<void> {
 
     const renderedLedStrip: LedStrip = ledController.getLedStrip();
 
-    response.status(200).json({renderedLedStrip});
+    response.status(200).json({ledStrip: renderedLedStrip});
   });
 }
 

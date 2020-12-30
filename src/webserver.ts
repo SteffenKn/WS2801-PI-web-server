@@ -14,6 +14,7 @@ export class Webserver {
 
   constructor(port: number) {
     this.port = port;
+    this.server = express();
   }
 
   public start(): void {
@@ -21,8 +22,6 @@ export class Webserver {
   }
 
   private initializeWebserver(): void {
-    this.server = express();
-
     this.server.use(bodyParser.json());
     this.server.use(cors());
 

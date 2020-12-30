@@ -43,17 +43,17 @@ export class Ws2801PiWebserver {
   }
 
   private addRoutes(): void {
-    this.webserver.addGetRoute('/login-required', this.loginRequired);
-    this.webserver.addGetRoute('/led-strip', this.getLedStrip);
-    this.webserver.addPostRoute('/led-strip/fill', this.fillLedStrip);
-    this.webserver.addPostRoute('/led-strip/clear', this.clearLedStrip);
-    this.webserver.addPostRoute('/led-strip/led/:ledIndex/set', this.setSingleLedColor);
-    this.webserver.addPostRoute('/led-strip/brightness/set', this.setBrightness);
-    this.webserver.addGetRoute('/led-strip/brightness', this.getBrightness);
-    this.webserver.addPostRoute('/led-strip/set', this.setLedStrip);
-    this.webserver.addPostRoute('/led-strip/animation/start', this.startAnimation);
-    this.webserver.addDeleteRoute('/led-strip/animation/stop', this.stopAnimation);
-    this.webserver.addGetRoute('/led-strip/animation/finished', this.waitForAnimationToFinish);
+    this.webserver.addGetRoute('/login-required', this.loginRequired.bind(this));
+    this.webserver.addGetRoute('/led-strip', this.getLedStrip.bind(this));
+    this.webserver.addPostRoute('/led-strip/fill', this.fillLedStrip.bind(this));
+    this.webserver.addPostRoute('/led-strip/clear', this.clearLedStrip.bind(this));
+    this.webserver.addPostRoute('/led-strip/led/:ledIndex/set', this.setSingleLedColor.bind(this));
+    this.webserver.addPostRoute('/led-strip/brightness/set', this.setBrightness.bind(this));
+    this.webserver.addGetRoute('/led-strip/brightness', this.getBrightness.bind(this));
+    this.webserver.addPostRoute('/led-strip/set', this.setLedStrip.bind(this));
+    this.webserver.addPostRoute('/led-strip/animation/start', this.startAnimation.bind(this));
+    this.webserver.addDeleteRoute('/led-strip/animation/stop', this.stopAnimation.bind(this));
+    this.webserver.addGetRoute('/led-strip/animation/finished', this.waitForAnimationToFinish.bind(this));
   }
 
   // Route functions

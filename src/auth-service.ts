@@ -91,14 +91,14 @@ export class AuthService {
   }
 
   private addAuthMiddleware(): void {
-    this.webserver.addMiddleware(this.authMiddleware);
+    this.webserver.addMiddleware(this.authMiddleware.bind(this));
   }
 
   private addAuthRoutes(): void {
-    this.webserver.addPostRoute('/register', this.register);
-    this.webserver.addPostRoute('/login', this.login);
+    this.webserver.addPostRoute('/register', this.register.bind(this));
+    this.webserver.addPostRoute('/login', this.login.bind(this));
 
-    this.confirmationWebserver.addGetRoute('/confirm-registration', this.confirmRegistration);
+    this.confirmationWebserver.addGetRoute('/confirm-registration', this.confirmRegistration.bind(this));
   }
 
   private async waitForConfirmation(name: string): Promise<void> {

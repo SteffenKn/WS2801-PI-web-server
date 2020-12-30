@@ -23,6 +23,10 @@ export class Ws2801PiWebserver {
   constructor(config?: Ws2801PiWebserverConfig, ledController?: LedController) {
     this.config = config ? config : DefaultConfig;
 
+    if (!ledController && ! this.config.amountOfLeds) {
+      throw new Error(`Either a ledController must be provided or the amount of leds must be provided via config!`);
+    }
+
     this.ledController = ledController ? ledController : new LedController(this.config.amountOfLeds);
     this.webserver = new Webserver(this.config.port);
     this.authService = new AuthService(this.webserver);
@@ -134,7 +138,7 @@ export class Ws2801PiWebserver {
       }
 
       try {
-        validateLedStrip(this.config.amountOfLeds, ledStrip);
+        validateLedStrip(this.ledController.getLedStrip().length, ledStrip);
       } catch (error) {
         response.status(400).send(error.message);
 

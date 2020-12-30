@@ -43,173 +43,187 @@ export class Ws2801PiWebserver {
   }
 
   private addRoutes(): void {
-    this.webserver.addGetRoute('/login-required', (_: express.Request, response: express.Response): void => {
-      response.status(200).json({loginRequired: this.config.useAuth});
-    });
+    this.webserver.addGetRoute('/login-required', this.loginRequired);
+    this.webserver.addGetRoute('/led-strip', this.getLedStrip);
+    this.webserver.addPostRoute('/led-strip/fill', this.fillLedStrip);
+    this.webserver.addPostRoute('/led-strip/clear', this.clearLedStrip);
+    this.webserver.addPostRoute('/led-strip/led/:ledIndex/set', this.setSingleLedColor);
+    this.webserver.addPostRoute('/led-strip/brightness/set', this.setBrightness);
+    this.webserver.addGetRoute('/led-strip/brightness', this.getBrightness);
+    this.webserver.addPostRoute('/led-strip/set', this.setLedStrip);
+    this.webserver.addPostRoute('/led-strip/animation/start', this.startAnimation);
+    this.webserver.addDeleteRoute('/led-strip/animation/stop', this.stopAnimation);
+    this.webserver.addGetRoute('/led-strip/animation/finished', this.waitForAnimationToFinish);
+  }
 
-    this.webserver.addGetRoute('/led-strip', (_: express.Request, response: express.Response): void => {
-      const ledStrip: LedStrip = this.ledController.getLedStrip();
+  // Route functions
 
-      response.status(200).json({ledStrip: ledStrip});
-    });
+  private loginRequired(_: express.Request, response: express.Response): void {
+    response.status(200).json({loginRequired: this.config.useAuth});
+  }
 
-    this.webserver.addPostRoute('/led-strip/fill', async(request: express.Request, response: express.Response): Promise<void> => {
-      const color: LedColor = request.body.color;
+  private getLedStrip(_: express.Request, response: express.Response): void {
+    const ledStrip: LedStrip = this.ledController.getLedStrip();
 
-      if (!color) {
-        response.status(400).send(`Request body must contain a 'color', e.g. {red: 255, green: 0, blue: 0}.`);
+    response.status(200).json({ledStrip: ledStrip});
+  }
 
-        return;
-      }
+  private async fillLedStrip(request: express.Request, response: express.Response): Promise<void> {
+    const color: LedColor = request.body.color;
 
-      await this.ledController.fillLeds(color).show();
+    if (!color) {
+      response.status(400).send(`Request body must contain a 'color', e.g. {red: 255, green: 0, blue: 0}.`);
 
-      const ledStrip: LedStrip = this.ledController.getLedStrip();
+      return;
+    }
 
-      response.status(200).json({ledStrip: ledStrip});
-    });
+    await this.ledController.fillLeds(color).show();
 
-    this.webserver.addPostRoute('/led-strip/clear', async(request: express.Request, response: express.Response): Promise<void> => {
-      await this.ledController.clearLeds().show();
+    const ledStrip: LedStrip = this.ledController.getLedStrip();
 
-      const ledStrip: LedStrip = this.ledController.getLedStrip();
+    response.status(200).json({ledStrip: ledStrip});
+  }
 
-      response.status(200).json({ledStrip: ledStrip});
-    });
+  private async clearLedStrip(request: express.Request, response: express.Response): Promise<void> {
+    await this.ledController.clearLeds().show();
 
-    this.webserver.addPostRoute('/led-strip/led/:ledIndex/set', async(request: express.Request, response: express.Response): Promise<void> => {
-      const enteredLedIndex: string = request.params.ledIndex;
-      const ledIndex: number = parseInt(enteredLedIndex);
+    const ledStrip: LedStrip = this.ledController.getLedStrip();
 
-      const color: LedColor = request.body.color;
+    response.status(200).json({ledStrip: ledStrip});
+  }
 
-      if (Number.isNaN(ledIndex) || ledIndex < 0 || ledIndex >= this.config.amountOfLeds) {
-        response.status(400).send(`URL must contain a led index between 0 and ${this.config.amountOfLeds - 1} (Received ${enteredLedIndex}).`);
+  private async setSingleLedColor(request: express.Request, response: express.Response): Promise<void> {
+    const enteredLedIndex: string = request.params.ledIndex;
+    const ledIndex: number = parseInt(enteredLedIndex);
 
-        return;
-      }
+    const color: LedColor = request.body.color;
 
-      if (!color) {
-        response.status(400).send(`Request body must contain a 'color', e.g. {red: 255, green: 0, blue: 0}.`);
+    if (Number.isNaN(ledIndex) || ledIndex < 0 || ledIndex >= this.config.amountOfLeds) {
+      response.status(400).send(`URL must contain a led index between 0 and ${this.config.amountOfLeds - 1} (Received ${enteredLedIndex}).`);
 
-        return;
-      }
+      return;
+    }
 
-      await this.ledController.setLed(ledIndex, color).show();
+    if (!color) {
+      response.status(400).send(`Request body must contain a 'color', e.g. {red: 255, green: 0, blue: 0}.`);
 
-      const ledStrip: LedStrip = this.ledController.getLedStrip();
+      return;
+    }
 
-      response.status(200).json({ledStrip: ledStrip});
-    });
+    await this.ledController.setLed(ledIndex, color).show();
 
-    this.webserver.addPostRoute('/led-strip/brightness/set', async(request: express.Request, response: express.Response): Promise<void> => {
-      const brightness: number | 'auto' = request.body.brightness;
+    const ledStrip: LedStrip = this.ledController.getLedStrip();
 
-      if (brightness == undefined || (typeof brightness !== 'number' && brightness !== 'auto') || brightness < 0 || brightness > 100) {
-        response.status(400).send(`Request body must contain a 'brightness' (number between 0 and 100 or 'auto' for automatic brightness).`);
+    response.status(200).json({ledStrip: ledStrip});
+  }
 
-        return;
-      }
+  private async setBrightness(request: express.Request, response: express.Response): Promise<void> {
+    const brightness: number | 'auto' = request.body.brightness;
 
-      await this.ledController.setBrightness(brightness).show();
+    if (brightness == undefined || (typeof brightness !== 'number' && brightness !== 'auto') || brightness < 0 || brightness > 100) {
+      response.status(400).send(`Request body must contain a 'brightness' (number between 0 and 100 or 'auto' for automatic brightness).`);
 
-      if (this.currentAnimationProcess) {
-        this.currentAnimationProcess.send({brightness: brightness});
-      }
+      return;
+    }
 
-      const ledStrip: LedStrip = this.ledController.getLedStrip();
+    await this.ledController.setBrightness(brightness).show();
 
-      response.status(200).json({ledStrip: ledStrip});
-    });
+    if (this.currentAnimationProcess) {
+      this.currentAnimationProcess.send({brightness: brightness});
+    }
 
-    this.webserver.addGetRoute('/led-strip/brightness', async(request: express.Request, response: express.Response): Promise<void> => {
-      const brightness: number | 'auto' = this.ledController.getBrightness();
+    const ledStrip: LedStrip = this.ledController.getLedStrip();
 
-      response.status(200).json({brightness: brightness});
-    });
+    response.status(200).json({ledStrip: ledStrip});
+  }
 
-    this.webserver.addPostRoute('/led-strip/set', async(request: express.Request, response: express.Response): Promise<void> => {
-      const ledStrip: LedStrip = request.body.ledStrip;
+  private async getBrightness(request: express.Request, response: express.Response): Promise<void> {
+    const brightness: number | 'auto' = this.ledController.getBrightness();
 
-      if (!ledStrip) {
-        response.status(400).send(`Request body must contain a 'ledStrip' (an array of LedColors with the length of the led strip).`);
+    response.status(200).json({brightness: brightness});
+  }
 
-        return;
-      }
+  private async setLedStrip(request: express.Request, response: express.Response): Promise<void> {
+    const ledStrip: LedStrip = request.body.ledStrip;
 
-      try {
-        validateLedStrip(this.ledController.getLedStrip().length, ledStrip);
-      } catch (error) {
-        response.status(400).send(error.message);
+    if (!ledStrip) {
+      response.status(400).send(`Request body must contain a 'ledStrip' (an array of LedColors with the length of the led strip).`);
 
-        return;
-      }
+      return;
+    }
 
-      for (let ledIndex: number = 0; ledIndex < ledStrip.length; ledIndex++) {
-        this.ledController.setLed(ledIndex, ledStrip[ledIndex]);
-      }
+    try {
+      validateLedStrip(this.ledController.getLedStrip().length, ledStrip);
+    } catch (error) {
+      response.status(400).send(error.message);
 
-      await this.ledController.show();
+      return;
+    }
 
-      const renderedLedStrip: LedStrip = this.ledController.getLedStrip();
+    for (let ledIndex: number = 0; ledIndex < ledStrip.length; ledIndex++) {
+      this.ledController.setLed(ledIndex, ledStrip[ledIndex]);
+    }
 
-      response.status(200).json({ledStrip: renderedLedStrip});
-    });
+    await this.ledController.show();
 
-    this.webserver.addPostRoute('/led-strip/animation/start', async(request: express.Request, response: express.Response): Promise<void> => {
-      const animationScript: string = request.body.animationScript;
+    const renderedLedStrip: LedStrip = this.ledController.getLedStrip();
 
-      if (animationScript == undefined) {
-        response.status(400).send(`Request body must contain a 'animationScript'.`);
+    response.status(200).json({ledStrip: renderedLedStrip});
+  }
 
-        return;
-      }
+  private async startAnimation(request: express.Request, response: express.Response): Promise<void> {
+    const animationScript: string = request.body.animationScript;
 
-      if (this.currentAnimationProcess) {
+    if (animationScript == undefined) {
+      response.status(400).send(`Request body must contain a 'animationScript'.`);
+
+      return;
+    }
+
+    if (this.currentAnimationProcess) {
+      this.currentAnimationProcess.kill();
+      this.currentAnimationProcess = undefined;
+    }
+
+    const brightness: number | 'auto' = this.ledController.getBrightness();
+
+    this.currentAnimationProcess =
+      fork(path.join(__dirname, 'animator.js'), [JSON.stringify(this.config), animationScript, brightness.toString()], {});
+
+    // tslint:disable-next-line: typedef no-any
+    const eventCallback = (message: any): void => {
+      this.currentAnimationProcess.removeListener('message', eventCallback);
+
+      if (message === 'animation-finished') {
         this.currentAnimationProcess.kill();
         this.currentAnimationProcess = undefined;
       }
+    };
 
-      const brightness: number | 'auto' = this.ledController.getBrightness();
+    this.currentAnimationProcess.on('message', eventCallback);
 
-      this.currentAnimationProcess =
-        fork(path.join(__dirname, 'animator.js'), [JSON.stringify(this.config), animationScript, brightness.toString()], {});
+    response.status(200).send('success!');
+  }
 
-      // tslint:disable-next-line: typedef no-any
-      const eventCallback = (message: any): void => {
-        this.currentAnimationProcess.removeListener('message', eventCallback);
+  private async stopAnimation(request: express.Request, response: express.Response): Promise<void> {
+    if (this.currentAnimationProcess) {
+      this.currentAnimationProcess.kill();
+      this.currentAnimationProcess = undefined;
+    }
 
-        if (message === 'animation-finished') {
-          this.currentAnimationProcess.kill();
-          this.currentAnimationProcess = undefined;
-        }
-      };
+    response.status(200).send('success!');
+  }
 
-      this.currentAnimationProcess.on('message', eventCallback);
+  private async waitForAnimationToFinish(request: express.Request, response: express.Response): Promise<void> {
+    // tslint:disable-next-line: typedef no-any
+    const eventCallback = (message: any): void => {
+      this.currentAnimationProcess.removeListener('message', eventCallback);
 
-      response.status(200).send('success!');
-    });
-
-    this.webserver.addDeleteRoute('/led-strip/animation/stop', async(request: express.Request, response: express.Response): Promise<void> => {
-      if (this.currentAnimationProcess) {
-        this.currentAnimationProcess.kill();
-        this.currentAnimationProcess = undefined;
+      if (message === 'animation-finished') {
+        response.status(200).send('success!');
       }
+    };
 
-      response.status(200).send('success!');
-    });
-
-    this.webserver.addGetRoute('/led-strip/animation/finished', async(request: express.Request, response: express.Response): Promise<void> => {
-      // tslint:disable-next-line: typedef no-any
-      const eventCallback = (message: any): void => {
-        this.currentAnimationProcess.removeListener('message', eventCallback);
-
-        if (message === 'animation-finished') {
-          response.status(200).send('success!');
-        }
-      };
-
-      this.currentAnimationProcess.on('message', eventCallback);
-    });
+    this.currentAnimationProcess.on('message', eventCallback);
   }
 }

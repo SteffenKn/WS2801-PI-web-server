@@ -4,9 +4,9 @@ import vm from 'vm';
 
 import Ws2801Pi from 'ws2801-pi';
 
-const config: Ws2801PiWebserverConfig = JSON.parse(process.argv[3]);
-const animationScript: string = process.argv[4];
-const startBrightness: number | 'auto' = process.argv[5] === 'auto' ?  'auto' : parseInt(process.argv[3]);
+const config: Ws2801PiWebserverConfig = JSON.parse(process.argv[2]);
+const animationScript: string = process.argv[3];
+const startBrightness: number | 'auto' = process.argv[4] === 'auto' ?  'auto' : parseInt(process.argv[4]);
 
 async function runAnimation(): Promise<void> {
   const ledController: Ws2801Pi = new Ws2801Pi(config.amountOfLeds);

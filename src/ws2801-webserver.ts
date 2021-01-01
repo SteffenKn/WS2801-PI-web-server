@@ -92,14 +92,11 @@ export class Ws2801Webserver {
   private async getLedStrip(_: express.Request, response: express.Response): Promise<void> {
     if (this.currentAnimationProcess) {
       await new Promise((resolve: Function): void => {
-        // tslint:disable-next-line: no-any
-        const eventCallback: (message: any) => void = (receivedLedStrip: LedStrip): void => {
+        this.currentAnimationProcess.on('message', (receivedLedStrip: LedStrip): void => {
           response.status(200).json({ledStrip: receivedLedStrip});
 
           resolve();
-        };
-
-        this.currentAnimationProcess.on('message', eventCallback);
+        });
 
         this.currentAnimationProcess.send({action: 'get-led-strip'});
       });
@@ -247,8 +244,6 @@ export class Ws2801Webserver {
     // tslint:disable-next-line: typedef no-any
     const eventCallback = (message: any): void => {
       if (message === 'animation-finished') {
-        this.currentAnimationProcess.removeListener('message', eventCallback);
-
         this.currentAnimationProcess.kill();
         this.currentAnimationProcess = undefined;
 
@@ -276,14 +271,10 @@ export class Ws2801Webserver {
 
   private async waitForAnimationToFinish(request: express.Request, response: express.Response): Promise<void> {
     // tslint:disable-next-line: typedef no-any
-    const eventCallback = (message: any): void => {
-      this.currentAnimationProcess.removeListener('message', eventCallback);
-
+    this.currentAnimationProcess.on('message', (message: any): void => {
       if (message === 'animation-finished') {
         response.status(200).send('success!');
       }
-    };
-
-    this.currentAnimationProcess.on('message', eventCallback);
+    });
   }
 }

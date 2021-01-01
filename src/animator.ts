@@ -14,7 +14,7 @@ async function runAnimation(): Promise<void> {
 
   // tslint:disable-next-line: no-any
   process.on('message', (message: any): void => {
-    if (message.brightness) {
+    if (message.action === 'set-brightness') {
       ledController.setBrightness(message.brightness).show();
     }
   });

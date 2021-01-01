@@ -170,7 +170,7 @@ export class Ws2801PiWebserver {
     await this.ledController.setBrightness(brightness).show();
 
     if (this.currentAnimationProcess) {
-      this.currentAnimationProcess.send({brightness: brightness});
+      this.currentAnimationProcess.send({action: 'set-brightness', brightness: brightness});
     }
 
     if (this.config.useSocketIo) {

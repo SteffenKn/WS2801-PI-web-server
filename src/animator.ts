@@ -1,10 +1,10 @@
-import {Ws2801PiWebserverConfig} from './types/ws2801-pi-webserver-config';
+import {Ws2801WebserverConfig} from './types/index';
 
 import vm from 'vm';
 
 import Ws2801Pi, {LedStrip} from 'ws2801-pi';
 
-const config: Ws2801PiWebserverConfig = JSON.parse(process.argv[2]);
+const config: Ws2801WebserverConfig = JSON.parse(process.argv[2]);
 const animationScript: string = process.argv[3];
 const startBrightness: number | 'auto' = process.argv[4] === 'auto' ?  'auto' : parseInt(process.argv[4]);
 

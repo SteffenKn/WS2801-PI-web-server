@@ -1,4 +1,4 @@
-import {Ws2801PiWebserver} from './index';
+import {Ws2801Webserver} from './index';
 
-const webserver: Ws2801PiWebserver = new Ws2801PiWebserver();
+const webserver: Ws2801Webserver = new Ws2801Webserver();
 webserver.start();

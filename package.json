@@ -1,7 +1,7 @@
 {
-  "name": "ws2801-pi-webserver",
-  "version": "0.2.0",
-  "description": "A ready-to-use web server for the WS2801-Pi module.",
+  "name": "ws2801-webserver",
+  "version": "0.1.0",
+  "description": "A ready-to-use webserver for the WS2801-Pi module.",
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist && tsc",
@@ -11,20 +11,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SteffenKn/WS2801-PI-webserver.git"
+    "url": "git+https://github.com/SteffenKn/WS2801-webserver.git"
   },
   "keywords": [
     "ws2801",
     "led",
     "ledstrip",
-    "web server"
+    "webserver"
   ],
   "author": "Steffen Knaup",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/SteffenKn/WS2801-PI-webserver/issues"
+    "url": "https://github.com/SteffenKn/WS2801-webserver/issues"
   },
-  "homepage": "https://github.com/SteffenKn/WS2801-PI-webserver#readme",
+  "homepage": "https://github.com/SteffenKn/WS2801-webserver#readme",
   "dependencies": {
     "body-parser": "1.19.0",
     "cors": "2.8.5",

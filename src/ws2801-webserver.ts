@@ -10,19 +10,19 @@ import {validateLedStrip} from './led-strip-validation';
 import {SocketIoServer} from './socket-io-server';
 import {Webserver} from './webserver';
 
-import {Ws2801PiWebserverConfig} from './types';
+import {Ws2801WebserverConfig} from './types';
 
-export class Ws2801PiWebserver {
+export class Ws2801Webserver {
   private ledController: LedController;
   private webserver: Webserver;
   private socketIoServer: SocketIoServer;
   private authService: AuthService;
 
-  private config: Ws2801PiWebserverConfig;
+  private config: Ws2801WebserverConfig;
 
   private currentAnimationProcess: ChildProcess;
 
-  constructor(config?: Ws2801PiWebserverConfig, ledController?: LedController) {
+  constructor(config?: Ws2801WebserverConfig, ledController?: LedController) {
     this.config = config ? config : DefaultConfig;
 
     if (!ledController && ! this.config.amountOfLeds) {
@@ -92,6 +92,7 @@ export class Ws2801PiWebserver {
   private async getLedStrip(_: express.Request, response: express.Response): Promise<void> {
     if (this.currentAnimationProcess) {
       await new Promise((resolve: Function): void => {
+        // tslint:disable-next-line: no-any
         const eventCallback: (message: any) => void = (receivedLedStrip: LedStrip): void => {
           response.status(200).json({ledStrip: receivedLedStrip});
 

@@ -1,5 +1,5 @@
 export class Logger {
-  private appName: string = 'WS2801-Pi-webserver';
+  private appName: string = 'WS2801-webserver';
   private moduleName: string;
 
   constructor(moduleName: string) {

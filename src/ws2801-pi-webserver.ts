@@ -7,6 +7,7 @@ import LedController, {LedColor, LedStrip} from 'ws2801-pi';
 import {AuthService} from './auth-service';
 import {Config as DefaultConfig} from './config/config';
 import {validateLedStrip} from './led-strip-validation';
+import {SocketIoServer} from './socket-io-server';
 import {Webserver} from './webserver';
 
 import {Ws2801PiWebserverConfig} from './types';
@@ -14,6 +15,7 @@ import {Ws2801PiWebserverConfig} from './types';
 export class Ws2801PiWebserver {
   private ledController: LedController;
   private webserver: Webserver;
+  private socketIoServer: SocketIoServer;
   private authService: AuthService;
 
   private config: Ws2801PiWebserverConfig;
@@ -30,16 +32,30 @@ export class Ws2801PiWebserver {
     this.ledController = ledController ? ledController : new LedController(this.config.amountOfLeds);
     this.webserver = new Webserver(this.config.port);
     this.authService = new AuthService(this.webserver);
+
+    if (this.config.useSocketIo) {
+      this.socketIoServer = new SocketIoServer(this.webserver.getExpressServer());
+    }
   }
 
   public start(): void {
     this.addRoutes();
+    // this.addSocketIoListeners();
+    this.addSocketIoEmitters();
 
     this.webserver.start();
 
     if (this.config.useAuth) {
      this. authService.start();
     }
+  }
+
+  public getLedController(): LedController {
+    return this.ledController;
+  }
+
+  public getExpressServer(): express.Express {
+    return this.webserver.getExpressServer();
   }
 
   private addRoutes(): void {
@@ -54,6 +70,19 @@ export class Ws2801PiWebserver {
     this.webserver.addPostRoute('/led-strip/animation/start', this.startAnimation.bind(this));
     this.webserver.addDeleteRoute('/led-strip/animation/stop', this.stopAnimation.bind(this));
     this.webserver.addGetRoute('/led-strip/animation/finished', this.waitForAnimationToFinish.bind(this));
+  }
+
+  // private addSocketIoListeners(): void {
+  // }
+
+  private addSocketIoEmitters(): void {
+    this.ledController.onLedStripChanged((ledStrip: LedStrip): void => {
+      this.socketIoServer.send('led-strip__changed', ledStrip);
+    });
+
+    this.ledController.onBrightnessChanged((brightness: number): void => {
+      this.socketIoServer.send('brightness__changed', brightness);
+    });
   }
 
   // Route functions
@@ -81,6 +110,10 @@ export class Ws2801PiWebserver {
 
     const ledStrip: LedStrip = this.ledController.getLedStrip();
 
+    if (this.config.useSocketIo) {
+      this.socketIoServer.send('led-strip-changed', {ledStrip: ledStrip});
+    }
+
     response.status(200).json({ledStrip: ledStrip});
   }
 
@@ -88,6 +121,10 @@ export class Ws2801PiWebserver {
     await this.ledController.clearLeds().show();
 
     const ledStrip: LedStrip = this.ledController.getLedStrip();
+
+    if (this.config.useSocketIo) {
+      this.socketIoServer.send('led-strip-changed', {ledStrip: ledStrip});
+    }
 
     response.status(200).json({ledStrip: ledStrip});
   }
@@ -114,6 +151,10 @@ export class Ws2801PiWebserver {
 
     const ledStrip: LedStrip = this.ledController.getLedStrip();
 
+    if (this.config.useSocketIo) {
+      this.socketIoServer.send('led-strip-changed', {ledStrip: ledStrip});
+    }
+
     response.status(200).json({ledStrip: ledStrip});
   }
 
@@ -132,9 +173,11 @@ export class Ws2801PiWebserver {
       this.currentAnimationProcess.send({brightness: brightness});
     }
 
-    const ledStrip: LedStrip = this.ledController.getLedStrip();
+    if (this.config.useSocketIo) {
+      this.socketIoServer.send('brightness-changed', {brightness: brightness});
+    }
 
-    response.status(200).json({ledStrip: ledStrip});
+    response.status(200).send('success');
   }
 
   private async getBrightness(request: express.Request, response: express.Response): Promise<void> {
@@ -168,6 +211,10 @@ export class Ws2801PiWebserver {
 
     const renderedLedStrip: LedStrip = this.ledController.getLedStrip();
 
+    if (this.config.useSocketIo) {
+      this.socketIoServer.send('led-strip-changed', {ledStrip: renderedLedStrip});
+    }
+
     response.status(200).json({ledStrip: renderedLedStrip});
   }
 
@@ -190,17 +237,34 @@ export class Ws2801PiWebserver {
     this.currentAnimationProcess =
       fork(path.join(__dirname, 'animator.js'), [JSON.stringify(this.config), animationScript, brightness.toString()], {});
 
+    if (this.config.useSocketIo) {
+      const ledStrip: LedStrip = this.ledController.getLedStrip();
+      this.socketIoServer.send('animation-started', {ledStrip: ledStrip});
+    }
+
     // tslint:disable-next-line: typedef no-any
     const eventCallback = (message: any): void => {
-      this.currentAnimationProcess.removeListener('message', eventCallback);
-
       if (message === 'animation-finished') {
+        this.currentAnimationProcess.removeListener('message', eventCallback);
+
         this.currentAnimationProcess.kill();
         this.currentAnimationProcess = undefined;
+
+        if (this.config.useSocketIo) {
+          const ledStrip: LedStrip = this.ledController.getLedStrip();
+          this.socketIoServer.send('animation-finished', {ledStrip: ledStrip});
+        }
       }
     };
 
     this.currentAnimationProcess.on('message', eventCallback);
+
+    // TODO:
+    // if (this.config.useSocketIo) {
+    //   this.currentAnimationProcess.on('led-strip-changed', (ledStrip: LedStrip): void => {
+    //     this.socketIoServer.send('led-strip-changed', {ledStrip: ledStrip});
+    //   });
+    // }
 
     response.status(200).send('success!');
   }
@@ -209,6 +273,11 @@ export class Ws2801PiWebserver {
     if (this.currentAnimationProcess) {
       this.currentAnimationProcess.kill();
       this.currentAnimationProcess = undefined;
+    }
+
+    if (this.config.useSocketIo) {
+      const ledStrip: LedStrip = this.ledController.getLedStrip();
+      this.socketIoServer.send('animation-stopped', {ledStrip: ledStrip});
     }
 
     response.status(200).send('success!');

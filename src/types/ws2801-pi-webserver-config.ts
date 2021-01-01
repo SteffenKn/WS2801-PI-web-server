@@ -3,4 +3,5 @@ export type Ws2801PiWebserverConfig = {
   amountOfLeds?: number,
   useAuth: boolean,
   confirmationPort: number,
+  useSocketIo: boolean,
 };

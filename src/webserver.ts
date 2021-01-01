@@ -21,13 +21,13 @@ export class Webserver {
   }
 
   public start(): void {
-    this.initializeWebserver();
-  }
-
-  private initializeWebserver(): void {
     this.server.listen(this.port, (): void => {
       logger.log(`listening on port ${this.port}!`);
     });
+  }
+
+  public getExpressServer(): express.Express {
+    return this.server;
   }
 
   public addMiddleware(middleware: ExpressMiddleware): void {

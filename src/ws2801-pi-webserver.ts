@@ -40,8 +40,11 @@ export class Ws2801PiWebserver {
 
   public start(): void {
     this.addRoutes();
-    // this.addSocketIoListeners();
-    this.addSocketIoEmitters();
+
+    if (this.config.useSocketIo) {
+      // this.addSocketIoListeners();
+      this.addSocketIoEmitters();
+    }
 
     this.webserver.start();
 

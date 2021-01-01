@@ -1,6 +1,7 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
+import Http from 'http';
 
 import {Logger} from './logger';
 import {ExpressCallback, ExpressMiddleware} from './types/index';
@@ -9,21 +10,27 @@ const logger: Logger = new Logger('Webserver');
 
 export class Webserver {
   private server: express.Express;
+  private httpServer: Http.Server;
 
   private port: number;
 
   constructor(port: number) {
     this.port = port;
     this.server = express();
+    this.httpServer = Http.createServer(this.server);
 
     this.server.use(bodyParser.json());
     this.server.use(cors());
   }
 
   public start(): void {
-    this.server.listen(this.port, (): void => {
+    this.httpServer.listen(this.port, (): void => {
       logger.log(`listening on port ${this.port}!`);
     });
+  }
+
+  public getHttpServer(): Http.Server {
+    return this.httpServer;
   }
 
   public getExpressServer(): express.Express {

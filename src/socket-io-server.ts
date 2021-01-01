@@ -1,4 +1,3 @@
-import express from 'express';
 import Http from 'http';
 import {Server as SocketIo} from 'socket.io';
 import uuid from 'uuid';
@@ -16,8 +15,7 @@ export class SocketIoServer {
 
   private listeners: {[id: string]: Listener} = {};
 
-  constructor(expressServer: express.Express) {
-    const httpServer: Http.Server = Http.createServer(expressServer);
+  constructor(httpServer: Http.Server) {
     this.socketIo = new SocketIo(httpServer);
   }
 

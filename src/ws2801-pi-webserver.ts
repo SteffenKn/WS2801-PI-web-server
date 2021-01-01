@@ -32,7 +32,7 @@ export class Ws2801PiWebserver {
     this.ledController = ledController ? ledController : new LedController(this.config.amountOfLeds);
     this.webserver = new Webserver(this.config.port);
     this.authService = new AuthService(this.webserver);
-    this.socketIoServer = new SocketIoServer(this.webserver.getExpressServer());
+    this.socketIoServer = new SocketIoServer(this.webserver.getHttpServer());
   }
 
   public start(): void {

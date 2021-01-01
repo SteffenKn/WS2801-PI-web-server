@@ -91,7 +91,23 @@ export class Ws2801PiWebserver {
     response.status(200).json({loginRequired: this.config.useAuth});
   }
 
-  private getLedStrip(_: express.Request, response: express.Response): void {
+  private async getLedStrip(_: express.Request, response: express.Response): Promise<void> {
+    if (this.currentAnimationProcess) {
+      await new Promise((resolve: Function): void => {
+        const eventCallback: (message: any) => void = (receivedLedStrip: LedStrip): void => {
+          response.status(200).json({ledStrip: receivedLedStrip});
+
+          resolve();
+        };
+
+        this.currentAnimationProcess.on('message', eventCallback);
+
+        this.currentAnimationProcess.send({action: 'get-led-strip'});
+      });
+
+      return;
+    }
+
     const ledStrip: LedStrip = this.ledController.getLedStrip();
 
     response.status(200).json({ledStrip: ledStrip});

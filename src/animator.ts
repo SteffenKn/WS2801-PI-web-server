@@ -2,7 +2,7 @@ import {Ws2801PiWebserverConfig} from './types/ws2801-pi-webserver-config';
 
 import vm from 'vm';
 
-import Ws2801Pi from 'ws2801-pi';
+import Ws2801Pi, {LedStrip} from 'ws2801-pi';
 
 const config: Ws2801PiWebserverConfig = JSON.parse(process.argv[2]);
 const animationScript: string = process.argv[3];
@@ -16,6 +16,8 @@ async function runAnimation(): Promise<void> {
   process.on('message', (message: any): void => {
     if (message.action === 'set-brightness') {
       ledController.setBrightness(message.brightness).show();
+    } else if (message.action === 'get-led-strip') {
+      process.send({action: 'get-led-strip-answer', ledStrip: ledController.getLedStrip()});
     }
   });
 

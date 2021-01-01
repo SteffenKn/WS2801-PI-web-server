@@ -270,6 +270,10 @@ export class Ws2801PiWebserver {
           const ledStrip: LedStrip = this.ledController.getLedStrip();
           this.socketIoServer.send('animation-finished', {ledStrip: ledStrip});
         }
+      } else if (message.action === 'led-strip-changed') {
+        if (this.config.useSocketIo) {
+          this.socketIoServer.send('led-strip__changed', message.ledStrip);
+        }
       }
     };
 

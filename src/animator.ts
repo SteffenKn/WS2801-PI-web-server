@@ -33,6 +33,10 @@ async function runAnimation(): Promise<void> {
     },
   ));
 
+  ledController.onLedStripChanged((ledStrip: LedStrip): void => {
+    process.send({action: 'led-strip-changed', ledStrip: ledStrip});
+  });
+
   await vm.runInContext(animationScript, context);
 
   process.send('animation-finished');

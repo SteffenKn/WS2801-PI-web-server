@@ -22,7 +22,7 @@ export class SocketIoServer {
   }
 
   // tslint:disable-next-line: no-any
-  public send(event: string, data: any): void {
+  public send(event: string, data?: any): void {
     this.socketIo.emit(event, data);
   }
 

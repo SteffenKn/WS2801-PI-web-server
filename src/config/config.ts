@@ -6,5 +6,4 @@ export const Config: Ws2801PiWebserverConfig = {
   amountOfLeds: 141,
   useAuth: true,
   confirmationPort: 45452,
-  useSocketIo: false,
 };

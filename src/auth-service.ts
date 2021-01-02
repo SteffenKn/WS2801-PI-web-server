@@ -29,12 +29,13 @@ export class AuthService {
 
   public start(): void {
     this.confirmationWebserver = new Webserver(Config.confirmationPort);
-    this.confirmationWebserver.start();
 
     this.loadUsers();
 
     this.addAuthMiddleware();
     this.addAuthRoutes();
+
+    this.confirmationWebserver.start();
   }
 
   private registerUser(name: string, apiKey: string): User {

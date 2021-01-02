@@ -111,6 +111,7 @@ export class Ws2801Webserver {
 
   private async fillLedStrip(request: express.Request, response: express.Response): Promise<void> {
     const color: LedColor = request.body.color;
+    const brightness: number | undefined = request.body.brightness;
 
     if (!color) {
       response.status(400).send(`Request body must contain a 'color', e.g. {red: 255, green: 0, blue: 0}.`);
@@ -118,7 +119,13 @@ export class Ws2801Webserver {
       return;
     }
 
-    await this.ledController.fillLeds(color).show();
+    this.ledController.fillLeds(color);
+
+    if (brightness) {
+      this.ledController.setBrightness(brightness);
+    }
+
+    await this.ledController.show();
 
     const ledStrip: LedStrip = this.ledController.getLedStrip();
 
@@ -142,6 +149,7 @@ export class Ws2801Webserver {
     const ledIndex: number = parseInt(enteredLedIndex);
 
     const color: LedColor = request.body.color;
+    const brightness: number | undefined = request.body.brightness;
 
     if (Number.isNaN(ledIndex) || ledIndex < 0 || ledIndex >= this.config.amountOfLeds) {
       response.status(400).send(`URL must contain a led index between 0 and ${this.config.amountOfLeds - 1} (Received ${enteredLedIndex}).`);
@@ -155,7 +163,13 @@ export class Ws2801Webserver {
       return;
     }
 
-    await this.ledController.setLed(ledIndex, color).show();
+    this.ledController.setLed(ledIndex, color);
+
+    if (brightness) {
+      this.ledController.setBrightness(brightness);
+    }
+
+    await this.ledController.show();
 
     const ledStrip: LedStrip = this.ledController.getLedStrip();
 
@@ -192,6 +206,7 @@ export class Ws2801Webserver {
 
   private async setLedStrip(request: express.Request, response: express.Response): Promise<void> {
     const ledStrip: LedStrip = request.body.ledStrip;
+    const brightness: number | undefined = request.body.brightness;
 
     if (!ledStrip) {
       response.status(400).send(`Request body must contain a 'ledStrip' (an array of LedColors with the length of the led strip).`);
@@ -209,6 +224,10 @@ export class Ws2801Webserver {
 
     for (let ledIndex: number = 0; ledIndex < ledStrip.length; ledIndex++) {
       this.ledController.setLed(ledIndex, ledStrip[ledIndex]);
+    }
+
+    if (brightness) {
+      this.ledController.setBrightness(brightness);
     }
 
     await this.ledController.show();

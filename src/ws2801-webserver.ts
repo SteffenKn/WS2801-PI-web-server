@@ -36,16 +36,16 @@ export class Ws2801Webserver {
   }
 
   public start(): void {
+    if (this.config.useAuth) {
+     this.authService.start();
+    }
+
     this.addRoutes();
 
     // this.addSocketIoListeners();
     this.addSocketIoEmitters();
 
     this.webserver.start();
-
-    if (this.config.useAuth) {
-     this. authService.start();
-    }
   }
 
   public getLedController(): LedController {

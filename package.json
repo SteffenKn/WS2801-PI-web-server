@@ -6,8 +6,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "lint": "tslint --project .",
-    "start": "node dist/run.js",
-    "test": ""
+    "start": "node dist/run.js"
   },
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const PERSISTENCE_FOLDER: string = path.join(__dirname, '..', '.storage');
+const PERSISTENCE_FOLDER: string = path.join(process.cwd(), '..', '.storage');
 
 export class Persister {
   constructor() {

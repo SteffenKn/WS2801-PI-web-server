@@ -29,6 +29,10 @@ export class Webserver {
     });
   }
 
+  public stop(): void {
+    this.httpServer.close();
+  }
+
   public getHttpServer(): Http.Server {
     return this.httpServer;
   }

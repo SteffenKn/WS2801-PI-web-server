@@ -25,17 +25,20 @@ export class AuthService {
 
     this.logger = new Logger('Auth Service');
     this.persister = new Persister();
+    this.confirmationWebserver = new Webserver(Config.confirmationPort);
   }
 
   public start(): void {
-    this.confirmationWebserver = new Webserver(Config.confirmationPort);
-
     this.loadUsers();
 
     this.addAuthMiddleware();
     this.addAuthRoutes();
 
     this.confirmationWebserver.start();
+  }
+
+  public stop(): void {
+    this.confirmationWebserver.stop();
   }
 
   private registerUser(name: string, apiKey: string): User {

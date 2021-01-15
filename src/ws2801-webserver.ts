@@ -48,6 +48,11 @@ export class Ws2801Webserver {
     this.webserver.start();
   }
 
+  public stop(): void {
+    this.authService.stop();
+    this.webserver.stop();
+  }
+
   public getLedController(): LedController {
     return this.ledController;
   }

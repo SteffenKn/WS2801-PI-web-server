@@ -1,6 +1,6 @@
 {
   "name": "ws2801-webserver",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "A ready-to-use webserver for the WS2801-Pi module.",
   "main": "dist/index.js",
   "scripts": {

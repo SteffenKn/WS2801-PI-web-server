@@ -263,7 +263,7 @@ export class Ws2801Webserver {
     this.currentAnimationProcess =
       fork(path.join(__dirname, 'animator.js'), [this.ledController.getLedStrip().length.toString(), animationScript, brightness.toString()], {});
 
-    this.socketIoServer.send('animation-started');
+    this.socketIoServer.send('animation__started');
 
     // tslint:disable-next-line: typedef no-any
     const eventCallback = (message: any): void => {
@@ -271,7 +271,7 @@ export class Ws2801Webserver {
         this.currentAnimationProcess.kill();
         this.currentAnimationProcess = undefined;
 
-        this.socketIoServer.send('animation-finished');
+        this.socketIoServer.send('animation__finished');
       } else if (message.action === 'led-strip-changed') {
         this.socketIoServer.send('led-strip__changed', message.ledStrip);
       }
@@ -288,7 +288,7 @@ export class Ws2801Webserver {
       this.currentAnimationProcess = undefined;
     }
 
-    this.socketIoServer.send('animation-stopped');
+    this.socketIoServer.send('animation__stopped');
 
     response.status(200).send('success!');
   }

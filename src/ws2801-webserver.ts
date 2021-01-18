@@ -261,7 +261,7 @@ export class Ws2801Webserver {
     const brightness: number | 'auto' = this.ledController.getBrightness();
 
     this.currentAnimationProcess =
-      fork(path.join(__dirname, 'animator.js'), [JSON.stringify(this.config), animationScript, brightness.toString()], {});
+      fork(path.join(__dirname, 'animator.js'), [this.ledController.getLedStrip().length.toString(), animationScript, brightness.toString()], {});
 
     this.socketIoServer.send('animation-started');
 

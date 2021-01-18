@@ -1,15 +1,13 @@
-import {Ws2801WebserverConfig} from './types/index';
-
 import vm from 'vm';
 
 import Ws2801Pi, {LedStrip} from 'ws2801-pi';
 
-const config: Ws2801WebserverConfig = JSON.parse(process.argv[2]);
+const amountOfLeds: number = parseInt(process.argv[2]);
 const animationScript: string = process.argv[3];
 const startBrightness: number | 'auto' = process.argv[4] === 'auto' ?  'auto' : parseInt(process.argv[4]);
 
 async function runAnimation(): Promise<void> {
-  const ledController: Ws2801Pi = new Ws2801Pi(config.amountOfLeds);
+  const ledController: Ws2801Pi = new Ws2801Pi(amountOfLeds);
   ledController.setBrightness(startBrightness);
 
   // tslint:disable-next-line: no-any
@@ -26,7 +24,7 @@ async function runAnimation(): Promise<void> {
     global,
     {
       ledController: ledController,
-      ledAmount: config.amountOfLeds,
+      ledAmount: amountOfLeds,
       exports: exports,
       module: module,
       console: console,

@@ -66,13 +66,13 @@ The config may look like this:
 
 - `config`
   - optional
-  - Type: [Config](./types/config.ts)
+  - Type: [Config](./src/types/config.ts)
   - The config for this module as described [here](#Configuration). If no value is set the [default config](./src/config/config.ts) will be used.
 
 - `ledController`
   - optional
   - Type: [LedController](https://github.com/SteffenKn/WS2801-PI/blob/develop/src/index.ts#L44)
-  - The LED controller that controls the leds of the connected Led strip. If no value is provided WS2801-webserver will create it's own LedController with the LedAmount that is configured in the [default config](./src/config/config).
+  - The LED controller that controls the leds of the connected Led strip. If no value is provided WS2801-webserver will create it's own LedController with the LedAmount that is configured in the [default config](./src/config/config.ts).
     - To prevent render problems there should be only one LedController instance.
 
 ### start
@@ -328,12 +328,12 @@ Gets triggered everytime an animation was stopped.
 ## Authorization
 
 The auth mechanism provides simple authorization. It can be activated or deactivated via the config.
-In order to check if a WS2801-webserver instance uses authorization the [loginRequired route](#loginRequired) can be used.
+In order to check if a WS2801-webserver instance uses authorization the [loginRequired route](#get-login-required) can be used.
 
 The authorization works like so:
 
-- New user asks for registration via the [register route](#register), providing a username and an apiKey
+- New user asks for registration via the [register route](#post-register-auth), providing a username and an apiKey
 - If the username does not already exist, a confirmation link gets logged in the console.
 - As soon as the confirmation link was clicked the user is registered.
-- The user can than check if he is logged in by using the [login route](#login)
+- The user can than check if he is logged in by using the [login route](#post-login-auth)
 - The api key must than be provided as query parameter for any other api calls, otherwise a 403 error will be returend.

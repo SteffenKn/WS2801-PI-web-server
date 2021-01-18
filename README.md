@@ -319,7 +319,7 @@ Gets triggered everytime an animation was finished.
 
 - Event: 'animation__finished'
 
-### Animation storpped
+### Animation stopped
 
 Gets triggered everytime an animation was stopped.
 

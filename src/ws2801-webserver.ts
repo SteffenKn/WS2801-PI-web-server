@@ -294,6 +294,10 @@ export class Ws2801Webserver {
   }
 
   private async waitForAnimationToFinish(request: express.Request, response: express.Response): Promise<void> {
+    if (!this.currentAnimationProcess) {
+      response.status(200).send('success!');
+    }
+
     // tslint:disable-next-line: typedef no-any
     this.currentAnimationProcess.on('message', (message: any): void => {
       if (message === 'animation-finished') {

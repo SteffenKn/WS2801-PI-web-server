@@ -5,8 +5,7 @@ import {Logger} from './logger';
 import {Persister} from './persister';
 import {Webserver} from './webserver';
 
-import {Config} from './config/config';
-import {User} from './types/index';
+import {Config, User} from './types/index';
 
 type ResolveFunctionForRegistrationConfirmation = {name: string, resolveFunction: Function};
 
@@ -16,16 +15,19 @@ export class AuthService {
   private confirmationWebserver: Webserver;
   private logger: Logger;
 
+  private config: Config;
+
   private users: Array<User>;
 
   private resolveFunctionsForRegistrationConfirmation: Array<ResolveFunctionForRegistrationConfirmation> = [];
 
-  constructor(webserver: Webserver) {
+  constructor(config: Config, webserver: Webserver) {
+    this.config = config;
     this.webserver = webserver;
 
     this.logger = new Logger('Auth Service');
     this.persister = new Persister();
-    this.confirmationWebserver = new Webserver(Config.confirmationPort);
+    this.confirmationWebserver = new Webserver(this.config.confirmationPort);
   }
 
   public start(): void {
@@ -122,7 +124,7 @@ export class AuthService {
       });
 
       this.logger.log(`User '${name}' would like to register.
-Click this link to confirm: http://${ip.address()}:${Config.confirmationPort}/confirm-registration?name=${name.replace(/ /g, '%20').replace(/ /g, '%C2%A0')}`);
+Click this link to confirm: http://${ip.address()}:${this.config.confirmationPort}/confirm-registration?name=${name.replace(/ /g, '%20').replace(/ /g, '%C2%A0')}`);
     });
 
     return resolvePromise;

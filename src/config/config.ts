@@ -1,7 +1,7 @@
-import {Ws2801WebserverConfig} from '../types/index';
+import {Config} from '../types/index';
 
 // tslint:disable-next-line: variable-name
-export const Config: Ws2801WebserverConfig = {
+export const DefaultConfig: Config = {
   port: 45451,
   amountOfLeds: 141,
   useAuth: true,

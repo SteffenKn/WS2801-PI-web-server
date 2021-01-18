@@ -337,3 +337,5 @@ The authorization works like so:
 - As soon as the confirmation link was clicked the user is registered.
 - The user can than check if he is logged in by using the [login route](#post-login-auth)
 - The api key must than be provided as query parameter for any other api calls, otherwise a 403 error will be returend.
+
+The user data is stored in `$(PWD)/.storage/webserver-api-keys.json`.

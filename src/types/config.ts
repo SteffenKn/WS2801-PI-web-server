@@ -1,4 +1,4 @@
-export type Ws2801WebserverConfig = {
+export type Config = {
   port: number,
   amountOfLeds?: number,
   useAuth: boolean,

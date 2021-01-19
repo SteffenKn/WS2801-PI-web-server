@@ -2,7 +2,7 @@
 
 This is a ready-to-use webserver for the [WS2801-Pi package](https://www.npmjs.com/package/ws2801-pi).
 
-You may also want to have a look at [WS2801](https://github.com/SteffenKn/WS2801) which includes the [Webserver](https://www.npmjs.com/package/ws2801-webserver) (this package), the [Alexa handler](https://www.npmjs.com/package/ws2801-alexa) and the [LedController](https://www.npmjs.com/package/ws2801-pi).
+You may also want to take a look at [WS2801](https://github.com/SteffenKn/WS2801) which includes the [Webserver](https://www.npmjs.com/package/ws2801-webserver) (this package), the [Alexa handler](https://www.npmjs.com/package/ws2801-alexa), and the [LedController](https://www.npmjs.com/package/ws2801-pi).
 
 ## Wiring
 
@@ -10,19 +10,19 @@ The wiring of the Pi is described [here](https://github.com/SteffenKn/WS2801-PI#
 
 ## Usage
 
-There are basically two ways of how to use WS2801-webserver:
+There are basically two ways to use WS2801-webserver:
 
 ### Using this repository
 
 1. Clone this repository
-2. Edit the config file as described here
+2. Edit the config file as described [here](#Configuration)
 3. Run the build script: `npm run build`
-4. Run the start scripot: `npm start`
+4. Run the start script: `npm start`
 
 ### Using the npm module
 
 1. Create a new npm project folder
-2. Install this module `npm i ws2801-webser`
+2. Install this module: `npm i ws2801-webserver`
 
 ```typescript
 import {Config as WebserverConfig, Ws2801Webserver} from 'ws2801-webserver';
@@ -41,10 +41,10 @@ webserver.start();
 
 ## Configuration
 
-The config can be provided when initializing the Ws2801Webserver.
-If no config was provided or if the repository is used the defaultConfig will be used which is stored [here](./src/config/config.ts).
+The config can be specified when initializing the Ws2801Webserver.
+If no config was specified or if the repository is used, the defaultConfig which is stored [here](./src/config/config.ts).
 
-The config may look like this:
+The config can look like this:
 ```
 {
   port: 45451,
@@ -54,10 +54,10 @@ The config may look like this:
 };
 ```
 
-- `port` is used for the webserver that provides the most routes. This may be publicly available.
-- `confirmationPort` is only needed if the auth mechanism is activated (`useAuth` is set to true). This webserver provides the confirmation routes for new registration. This should never be publicly available, at least until a proper confirmation website is available.
-- `amountOfLeds` is used to define how many leds are connected to the Pi. This is only necessary if no other ledController is provided in the constructor.
-- `useAuth` is used to define if the auth mechanism should be used or not.
+- `port` is used for the webserver that provides the most routes. This may be publicly accessible.
+- `confirmationPort` is only needed if the auth mechanism is enabled (`useAuth` is set to true). This webserver provides the confirmation routes for new registrations. This should never be publicly accessible, at least until a proper confirmation website is available.
+- `amountOfLeds` is used to specify how many leds are connected to the Pi. This is only necessary if no other ledController is specified in the constructor.
+- `useAuth` is used to define whether the auth mechanism should be used or not.
 ## Functions
 
 ### constructor
@@ -67,13 +67,13 @@ The config may look like this:
 - `config`
   - optional
   - Type: [Config](./src/types/config.ts)
-  - The config for this module as described [here](#Configuration). If no value is set the [default config](./src/config/config.ts) will be used.
+  - The config for this module, as described [here](#Configuration). If no value is set, the [default config](./src/config/config.ts) is used.
 
 - `ledController`
   - optional
   - Type: [LedController](https://github.com/SteffenKn/WS2801-PI/blob/develop/src/index.ts#L44)
-  - The LED controller that controls the leds of the connected Led strip. If no value is provided WS2801-webserver will create it's own LedController with the LedAmount that is configured in the [default config](./src/config/config.ts).
-    - To prevent render problems there should be only one LedController instance.
+  - The led controller that controls the leds of the connected led strip. If no value is specified, WS2801-webserver will create its own LedController with the LedAmount that is configured in the [default config](./src/config/config.ts).
+    - To avoid rendering problems, there should be only one LedController instance.
 
 ### start
 
@@ -89,17 +89,17 @@ Returns the express server instance used by WS2801-webserver. This can be used t
 
 #### Returns
 
-Return the express server instance.
+Returns the express server instance.
 - Type: [express](https://www.npmjs.com/package/express)
 
 ## Routes
 
-The routes marked with [Auth] can only be used when the auth mechansim is activated.
-If the auth mechanism is activated, any routes except `/login-required` and `/register` an apiKey must be provided as query parameter. Otherwise a 403 will be returned.
+The routes marked with [Auth] can only be used if the auth mechanism is enabled.
+If the auth mechanism is enabled, an apiKey must be provided as a query parameter for all routes except `/login-required` and `/register`. Otherwise a 403 is returned.
 
 ### GET: /login-required
 
-Returns if the auth mechanism is activated or not.
+Returns wheter the auth mechanism is enabled or not.
 
 - Route: /login-required
 - Method: Get
@@ -130,7 +130,7 @@ Registers a new user and waits for confirmation.
       - Type: string
 ### Post: /login [Auth]
 
-Checks if an apiKey work.
+Checks if the specified apiKey is working.
 
 - Route: /login
 - Method: Post
@@ -144,7 +144,7 @@ Checks if an apiKey work.
   - 403
     - User in not registered
       - Type: string
-    - User is not permitted to use the api
+    - User is not allowed to use the api
       - Type: string
 
 ### Get: /led-strip
@@ -171,7 +171,7 @@ Fills the led strip with a single color.
     - Type: number
 - Returns:
   - 200
-    - The Led Strip was successfully changed.
+    - The Led Strip was changed successfully.
       - Type: {ledStrip: [LedStrip](https://github.com/SteffenKn/WS2801-PI/blob/develop/src/index.ts#L6)}
   - 400
     - Body was incorrect
@@ -242,7 +242,7 @@ Sets all leds according to the provided colors.
     - Type: number
 - Returns:
   - 200
-    - The Led Strip was successfully changed.
+    - The Led Strip was changed successfully.
       - Type: {ledStrip: [LedStrip](https://github.com/SteffenKn/WS2801-PI/blob/develop/src/index.ts#L6)}
   - 400
     - Body was incorrect
@@ -252,7 +252,7 @@ Sets all leds according to the provided colors.
 
 ### Post: /led-strip/animation/start
 
-Executes the provided animation script. The animation script must be provided as a string.
+Executes the provided animation script. The animation script must be passed as a string.
 The animation script can access the [LED controller](https://github.com/SteffenKn/WS2801-PI/blob/develop/src/index.ts#L44) via `ledController` and the amount of Leds via `ledAmount`.
 
 - Route /led-strip/set
@@ -262,7 +262,7 @@ The animation script can access the [LED controller](https://github.com/SteffenK
     - Type: string
 - Returns:
   - 200
-    - The animation was successfully started
+    - The animation was started successfully
       - Type: string
   - 400
     - Body was incorrect
@@ -276,7 +276,7 @@ Cancels the currently running animation.
 - Method: Delete
 - Returns:
   - 200
-    - The animation was successfully stopped
+    - The animation was stopped successfully
       - Type: string
 
 ### Get: /led-strip/animation/finished
@@ -295,47 +295,47 @@ Returns as soon as the currently running animation finished.
 
 ### LedStrip changed
 
-Gets triggered everytime the LedStrip gets changed.
+Triggered every time the LedStrip is changed.
 
 - Event: 'led-strip__changed'
 - Payload: [LedStrip](https://github.com/SteffenKn/WS2801-PI/blob/develop/src/index.ts#L6)
 
 ### Brightness changed
 
-Gets triggered everytime the brightness gets changed.
+Triggered ecery time the brightness gets changed.
 
 - Event: 'brightness__changed'
 - Payload: number
 
 ### Animation started
 
-Gets triggered everytime an animation was started.
+Triggered ecery time an animation was started.
 
 - Event: 'animation__started'
 
 ### Animation finished
 
-Gets triggered everytime an animation was finished.
+Triggered ecery time an animation was finished.
 
 - Event: 'animation__finished'
 
 ### Animation stopped
 
-Gets triggered everytime an animation was stopped.
+Triggered ecery time an animation was stopped.
 
 - Event: 'animation__stopped'
 
 ## Authorization
 
-The auth mechanism provides simple authorization. It can be activated or deactivated via the config.
-In order to check if a WS2801-webserver instance uses authorization the [loginRequired route](#get-login-required) can be used.
+The auth mechanism provides simple authorization. It can be enabled or disabled via the config.
+To check if a WS2801-webserver instance uses authorization, the [loginRequired route](#get-login-required) can be used.
 
-The authorization works like so:
+The authorization works as follows:
 
-- New user asks for registration via the [register route](#post-register-auth), providing a username and an apiKey
+- New user requests registration using the [register route](#post-register-auth), providing a username and an apiKey
 - If the username does not already exist, a confirmation link gets logged in the console.
-- As soon as the confirmation link was clicked the user is registered.
-- The user can than check if he is logged in by using the [login route](#post-login-auth)
-- The api key must than be provided as query parameter for any other api calls, otherwise a 403 error will be returend.
+- Once the confirmation link is clicked, the user is registered.
+- The user can then use the [login route](#post-login-auth) to verify that he is logged in.
+- The api key must then be provided as a query parameter for all other api calls, otherwise a 403 error will be returned.
 
 The user data is stored in `$(PWD)/.storage/webserver-api-keys.json`.

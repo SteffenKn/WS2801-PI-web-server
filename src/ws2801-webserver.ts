@@ -5,12 +5,12 @@ import path from 'path';
 import LedController, {LedColor, LedStrip} from 'ws2801-pi';
 
 import {AuthService} from './auth-service';
-import {Config as DefaultConfig} from './config/config';
+import {DefaultConfig} from './config/config';
 import {validateLedStrip} from './led-strip-validation';
 import {SocketIoServer} from './socket-io-server';
 import {Webserver} from './webserver';
 
-import {Ws2801WebserverConfig} from './types';
+import {Config} from './types';
 
 export class Ws2801Webserver {
   private ledController: LedController;
@@ -18,11 +18,11 @@ export class Ws2801Webserver {
   private socketIoServer: SocketIoServer;
   private authService: AuthService;
 
-  private config: Ws2801WebserverConfig;
+  private config: Config;
 
   private currentAnimationProcess: ChildProcess;
 
-  constructor(config?: Ws2801WebserverConfig, ledController?: LedController) {
+  constructor(config?: Config, ledController?: LedController) {
     this.config = config ? config : DefaultConfig;
 
     if (!ledController && ! this.config.amountOfLeds) {
@@ -31,7 +31,7 @@ export class Ws2801Webserver {
 
     this.ledController = ledController ? ledController : new LedController(this.config.amountOfLeds);
     this.webserver = new Webserver(this.config.port);
-    this.authService = new AuthService(this.webserver);
+    this.authService = new AuthService(this.config, this.webserver);
     this.socketIoServer = new SocketIoServer(this.webserver.getHttpServer());
   }
 
@@ -263,7 +263,7 @@ export class Ws2801Webserver {
     this.currentAnimationProcess =
       fork(path.join(__dirname, 'animator.js'), [this.ledController.getLedStrip().length.toString(), animationScript, brightness.toString()], {});
 
-    this.socketIoServer.send('animation-started');
+    this.socketIoServer.send('animation__started');
 
     // tslint:disable-next-line: typedef no-any
     const eventCallback = (message: any): void => {
@@ -271,7 +271,7 @@ export class Ws2801Webserver {
         this.currentAnimationProcess.kill();
         this.currentAnimationProcess = undefined;
 
-        this.socketIoServer.send('animation-finished');
+        this.socketIoServer.send('animation__finished');
       } else if (message.action === 'led-strip-changed') {
         this.socketIoServer.send('led-strip__changed', message.ledStrip);
       }
@@ -288,12 +288,16 @@ export class Ws2801Webserver {
       this.currentAnimationProcess = undefined;
     }
 
-    this.socketIoServer.send('animation-stopped');
+    this.socketIoServer.send('animation__stopped');
 
     response.status(200).send('success!');
   }
 
   private async waitForAnimationToFinish(request: express.Request, response: express.Response): Promise<void> {
+    if (!this.currentAnimationProcess) {
+      response.status(200).send('success!');
+    }
+
     // tslint:disable-next-line: typedef no-any
     this.currentAnimationProcess.on('message', (message: any): void => {
       if (message === 'animation-finished') {

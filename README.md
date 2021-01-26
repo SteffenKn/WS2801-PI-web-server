@@ -2,6 +2,8 @@
 
 This is a ready-to-use webserver for the [WS2801-Pi package](https://www.npmjs.com/package/ws2801-pi).
 
+There is also a [TypeScript client](https://www.npmjs.com/package/ws2801-client) for this webserver.
+
 You may also want to take a look at [WS2801](https://github.com/SteffenKn/WS2801) which includes the [Webserver](https://www.npmjs.com/package/ws2801-webserver) (this package), the [Alexa handler](https://www.npmjs.com/package/ws2801-alexa), and the [LedController](https://www.npmjs.com/package/ws2801-pi).
 
 ## Wiring

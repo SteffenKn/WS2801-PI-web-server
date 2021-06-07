@@ -3,4 +3,5 @@ export type Config = {
   amountOfLeds?: number,
   useAuth: boolean,
   confirmationPort: number,
+  logRequests?: boolean,
 };

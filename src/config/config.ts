@@ -6,4 +6,5 @@ export const DefaultConfig: Config = {
   amountOfLeds: 141,
   useAuth: true,
   confirmationPort: 45452,
+  logRequests: true,
 };

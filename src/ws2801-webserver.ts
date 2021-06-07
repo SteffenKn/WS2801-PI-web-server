@@ -30,7 +30,7 @@ export class Ws2801Webserver {
     }
 
     this.ledController = ledController ? ledController : new LedController(this.config.amountOfLeds);
-    this.webserver = new Webserver(this.config.port);
+    this.webserver = new Webserver(this.config.port, this.config.logRequests === true);
     this.authService = new AuthService(this.config, this.webserver);
     this.socketIoServer = new SocketIoServer(this.webserver.getHttpServer());
   }

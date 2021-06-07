@@ -27,7 +27,7 @@ export class AuthService {
 
     this.logger = new Logger('Auth Service');
     this.persister = new Persister();
-    this.confirmationWebserver = new Webserver(this.config.confirmationPort);
+    this.confirmationWebserver = new Webserver(this.config.confirmationPort, this.config.logRequests === true);
   }
 
   public start(): void {

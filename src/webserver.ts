@@ -13,14 +13,17 @@ export class Webserver {
   private httpServer: Http.Server;
 
   private port: number;
+  private logRequests: boolean;
 
-  constructor(port: number) {
+  constructor(port: number, logRequests: boolean) {
     this.port = port;
-    this.server = express();
-    this.httpServer = Http.createServer(this.server);
+    this.logRequests = logRequests;
 
+    this.server = express();
     this.server.use(bodyParser.json());
     this.server.use(cors());
+
+    this.httpServer = Http.createServer(this.server);
   }
 
   public start(): void {
@@ -47,7 +50,9 @@ export class Webserver {
 
   public addPostRoute(route: string, callback: ExpressCallback): void {
     const callbackWithLogging: ExpressCallback = (request: express.Request, response: express.Response): void => {
-      logger.log(`Requested (post) route '${route}' with body '${JSON.stringify(request.body, null, 2)}' with query params '${JSON.stringify(request.query, null, 2)}'.`);
+      if (this.logRequests) {
+        logger.log(`Requested (post) route '${route}' with body '${JSON.stringify(request.body, null, 2)}' with query params '${JSON.stringify(request.query, null, 2)}'.`);
+      }
 
       callback(request, response);
     };
@@ -57,7 +62,9 @@ export class Webserver {
 
   public addGetRoute(route: string, callback: ExpressCallback): void {
     const callbackWithLogging: ExpressCallback = (request: express.Request, response: express.Response): void => {
-      logger.log(`Requested (get) route '${route}' with query params '${JSON.stringify(request.query, null, 2)}'.`);
+      if (this.logRequests) {
+        logger.log(`Requested (get) route '${route}' with query params '${JSON.stringify(request.query, null, 2)}'.`);
+      }
 
       callback(request, response);
     };
@@ -66,7 +73,9 @@ export class Webserver {
   }
   public addDeleteRoute(route: string, callback: ExpressCallback): void {
     const callbackWithLogging: ExpressCallback = (request: express.Request, response: express.Response): void => {
-      logger.log(`Requested (delete) route '${route}' with query params '${JSON.stringify(request.query, null, 2)}'.`);
+      if (this.logRequests) {
+        logger.log(`Requested (delete) route '${route}' with query params '${JSON.stringify(request.query, null, 2)}'.`);
+      }
 
       callback(request, response);
     };
